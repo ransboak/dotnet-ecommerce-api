@@ -18,6 +18,7 @@ namespace ecommerce_api.Controllers
         {
             _productRepo = productRepo;
         }
+
         [HttpGet]
         public async Task<IActionResult> GetAll(){
             var stocks = await _productRepo.GetAllAsync();
@@ -25,6 +26,11 @@ namespace ecommerce_api.Controllers
             var stockDto = stocks.Select(s => s.ToProductDto());
 
             return Ok(stockDto);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id){
+            var product = await _productRepo.GetByIdAsync(id);
         }
     }
 }
