@@ -28,7 +28,6 @@ namespace ecommerce_api.Mappers
                 Name = productDto.Name,
                 Description = productDto.Description,
                 Price = productDto.Price,
-                Slug = productDto.Slug,
                 StockQuantity = productDto.StockQuantity,
                 Status = productDto.Status,
                 CategoryId = productDto.CategoryId,

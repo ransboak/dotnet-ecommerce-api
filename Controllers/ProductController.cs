@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ecommerce_api.Dtos;
 using ecommerce_api.Interfaces;
 using ecommerce_api.Mappers;
 using Microsoft.AspNetCore.Mvc;
@@ -37,6 +38,15 @@ namespace ecommerce_api.Controllers
             }
 
             return Ok(product.ToProductDto());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateProductDto productDto){
+            var productModel = productDto.ToProductFromCreateDto();
+
+            var product = await _productRepo.CreateAsync(productModel);
+
+            return CreatedAtAction(nameof(GetById), new { id = productModel.Id}, productModel.ToProductDto());
         }
     }
 }

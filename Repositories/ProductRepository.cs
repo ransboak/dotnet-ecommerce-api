@@ -20,6 +20,8 @@ namespace ecommerce_api.Repositories
         }
         public async Task<Product> CreateAsync(Product productModel)
         {
+            string baseSlug = productModel.Name.ToLower().Replace(" ", "-");
+            productModel.Slug = await GenerateUniqueSlugAsync(baseSlug);
             await _context.Products.AddAsync(productModel);
             await _context.SaveChangesAsync();
             return productModel;
@@ -27,9 +29,10 @@ namespace ecommerce_api.Repositories
 
         public async Task<Product?> DeleteAsync(int id)
         {
-           var existingProduct = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
+            var existingProduct = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
 
-            if(existingProduct == null){
+            if (existingProduct == null)
+            {
                 return null;
             }
 
@@ -47,7 +50,8 @@ namespace ecommerce_api.Repositories
         {
             var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
 
-            if(product == null){
+            if (product == null)
+            {
                 return null;
             }
 
@@ -58,7 +62,8 @@ namespace ecommerce_api.Repositories
         {
             var existingProduct = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
 
-            if(existingProduct == null){
+            if (existingProduct == null)
+            {
                 return null;
             }
 
@@ -68,10 +73,30 @@ namespace ecommerce_api.Repositories
             existingProduct.StockQuantity = productDto.StockQuantity;
             existingProduct.CategoryId = productDto.CategoryId;
             existingProduct.Status = productDto.Status;
-            existingProduct.Slug = productDto.Slug;
+            
+            if (existingProduct.Name != productDto.Name)
+            {
+                string baseSlug = productDto.Name.ToLower().Replace(" ", "-");
+                existingProduct.Slug = await GenerateUniqueSlugAsync(baseSlug);
+            }
 
             await _context.SaveChangesAsync();
             return existingProduct;
+        }
+
+        private async Task<string> GenerateUniqueSlugAsync(string baseSlug)
+        {
+            string uniqueSlug = baseSlug;
+            int count = 1;
+
+            // Check for uniqueness in the database
+            while (await _context.Products.AnyAsync(p => p.Slug == uniqueSlug))
+            {
+                uniqueSlug = $"{baseSlug}-{count}";
+                count++;
+            }
+
+            return uniqueSlug;
         }
     }
 }

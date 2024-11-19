@@ -13,8 +13,6 @@ namespace ecommerce_api.Dtos
 
         public decimal Price { get; set; }
 
-        public string Slug { get; set; } = string.Empty;
-
         public int StockQuantity { get; set; }
 
         public string Status { get; set; } = string.Empty;
