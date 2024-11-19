@@ -29,8 +29,14 @@ namespace ecommerce_api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id){
+        public async Task<IActionResult> GetById([FromRoute] int id){
             var product = await _productRepo.GetByIdAsync(id);
+
+            if(product == null){
+                return NotFound();
+            }
+
+            return Ok(product.ToProductDto());
         }
     }
 }

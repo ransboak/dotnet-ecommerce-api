@@ -18,14 +18,24 @@ namespace ecommerce_api.Repositories
         {
             _context = context;
         }
-        public Task<Product> CreateAsync(Product productModel)
+        public async Task<Product> CreateAsync(Product productModel)
         {
-            throw new NotImplementedException();
+            await _context.Products.AddAsync(productModel);
+            await _context.SaveChangesAsync();
+            return productModel;
         }
 
-        public Task<Product?> DeleteAsync(int id)
+        public async Task<Product?> DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+           var existingProduct = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
+
+            if(existingProduct == null){
+                return null;
+            }
+
+            _context.Products.Remove(existingProduct);
+            await _context.SaveChangesAsync();
+            return existingProduct;
         }
 
         public async Task<List<Product>> GetAllAsync()
@@ -33,14 +43,35 @@ namespace ecommerce_api.Repositories
             return await _context.Products.ToListAsync();
         }
 
-        public Task<Product?> GetByIdAsync(int id)
+        public async Task<Product?> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
+
+            if(product == null){
+                return null;
+            }
+
+            return product;
         }
 
-        public Task<Product?> UpdateAsync(int id, UpdateProductDto productDto)
+        public async Task<Product?> UpdateAsync(int id, UpdateProductDto productDto)
         {
-            throw new NotImplementedException();
+            var existingProduct = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
+
+            if(existingProduct == null){
+                return null;
+            }
+
+            existingProduct.Name = productDto.Name;
+            existingProduct.Price = productDto.Price;
+            existingProduct.Description = productDto.Description;
+            existingProduct.StockQuantity = productDto.StockQuantity;
+            existingProduct.CategoryId = productDto.CategoryId;
+            existingProduct.Status = productDto.Status;
+            existingProduct.Slug = productDto.Slug;
+
+            await _context.SaveChangesAsync();
+            return existingProduct;
         }
     }
 }
