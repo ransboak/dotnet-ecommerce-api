@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ecommerce_api.Data;
 using ecommerce_api.Dtos.Product;
 using ecommerce_api.Interfaces;
+using ecommerce_api.Mappers;
 using ecommerce_api.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -67,16 +68,19 @@ namespace ecommerce_api.Repositories
                 return null;
             }
 
-            existingProduct.Name = productDto.Name;
-            existingProduct.Price = productDto.Price;
-            existingProduct.Description = productDto.Description;
-            existingProduct.StockQuantity = productDto.StockQuantity;
-            existingProduct.CategoryId = productDto.CategoryId;
-            existingProduct.Status = productDto.Status;
-            
-            if (existingProduct.Name != productDto.Name)
+            var productModel = productDto.ToProductFromUpdateDto();
+            string originalName = existingProduct.Name;
+
+            existingProduct.Name = !string.IsNullOrWhiteSpace(productModel.Name) ? productModel.Name : existingProduct.Name;
+            existingProduct.Price = productModel.Price > 0 ? productModel.Price : existingProduct.Price;
+            existingProduct.Description = !string.IsNullOrWhiteSpace(productModel.Description) ? productModel.Description : existingProduct.Description;
+            existingProduct.StockQuantity = productModel.StockQuantity >= 0 ? productModel.StockQuantity : existingProduct.StockQuantity;
+            existingProduct.CategoryId = productModel.CategoryId ?? existingProduct.CategoryId;
+            existingProduct.Status = !string.IsNullOrWhiteSpace(productModel.Status) ? productModel.Status : existingProduct.Status;
+
+            if (!string.IsNullOrWhiteSpace(productModel.Name) && originalName != productModel.Name)
             {
-                string baseSlug = productDto.Name.ToLower().Replace(" ", "-");
+                string baseSlug = productModel.Name.ToLower().Replace(" ", "-");
                 existingProduct.Slug = await GenerateUniqueSlugAsync(baseSlug);
             }
 

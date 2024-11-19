@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ecommerce_api.Dtos;
+using ecommerce_api.Dtos.Product;
 using ecommerce_api.Interfaces;
 using ecommerce_api.Mappers;
 using Microsoft.AspNetCore.Mvc;
@@ -47,6 +48,28 @@ namespace ecommerce_api.Controllers
             var product = await _productRepo.CreateAsync(productModel);
 
             return CreatedAtAction(nameof(GetById), new { id = productModel.Id}, productModel.ToProductDto());
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateProductDto productDto){
+            var product = await _productRepo.UpdateAsync(id, productDto);
+
+            if(product == null){
+                return NotFound();
+            }
+
+            return Ok(product.ToProductDto());
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id){
+            var product = await _productRepo.DeleteAsync(id);
+
+            if(product == null){
+                return NotFound();
+            }
+
+            return NoContent();
         }
     }
 }
