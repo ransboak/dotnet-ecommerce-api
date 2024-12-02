@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ecommerce_api.Dtos;
 using ecommerce_api.Dtos.Product;
+using ecommerce_api.Helpers;
 using ecommerce_api.Interfaces;
 using ecommerce_api.Mappers;
 using Microsoft.AspNetCore.Mvc;
@@ -22,8 +23,8 @@ namespace ecommerce_api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(){
-            var stocks = await _productRepo.GetAllAsync();
+        public async Task<IActionResult> GetAll([FromQuery] ProductQuery query){
+            var stocks = await _productRepo.GetAllAsync(query);
 
             var stockDto = stocks.Select(s => s.ToProductDto());
 

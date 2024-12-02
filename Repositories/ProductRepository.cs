@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ecommerce_api.Data;
 using ecommerce_api.Dtos.Product;
+using ecommerce_api.Helpers;
 using ecommerce_api.Interfaces;
 using ecommerce_api.Mappers;
 using ecommerce_api.Models;
@@ -42,9 +43,14 @@ namespace ecommerce_api.Repositories
             return existingProduct;
         }
 
-        public async Task<List<Product>> GetAllAsync()
+        public async Task<List<Product>> GetAllAsync(ProductQuery query)
         {
-            return await _context.Products.ToListAsync();
+             var products = _context.Products.AsQueryable();
+
+             if(!string.IsNullOrWhiteSpace(query.Name)){
+                products = products.Where(s => s.Name.Contains(query.Name)); 
+            }
+            return await products.ToListAsync();
         }
 
         public async Task<Product?> GetByIdAsync(int id)
