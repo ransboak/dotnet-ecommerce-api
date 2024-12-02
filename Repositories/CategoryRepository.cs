@@ -19,9 +19,13 @@ namespace ecommerce_api.Repositories
             _context = context;
         }
 
-        public Task<Category> CreateAsync(Category categoryModel)
+        public async Task<Category> CreateAsync(Category categoryModel)
         {
-            throw new NotImplementedException();
+            string baseSlug = categoryModel.Name.ToLower().Replace(" ", "-");
+            categoryModel.Slug = await GenerateUniqueSlugAsync(baseSlug);
+            await _context.Categories.AddAsync(categoryModel);
+            await _context.SaveChangesAsync();
+            return categoryModel;
         }
 
         public Task<Category?> DeleteAsync(int id)
@@ -36,7 +40,7 @@ namespace ecommerce_api.Repositories
 
         public async Task<Category?> GetByIdAsync(int id)
         {
-            var category = await _context.Categories.FirstOrDefaultAsync(x => x.Id == id);
+            var category = await _context.Categories.Include(c => c.Products).FirstOrDefaultAsync(x => x.Id == id);
 
             if(category == null){
                 return null;
@@ -47,6 +51,21 @@ namespace ecommerce_api.Repositories
         public Task<Category?> UpdateAsync(int id, UpdateCategoryDto categoryDto)
         {
             throw new NotImplementedException();
+        }
+
+        private async Task<string> GenerateUniqueSlugAsync(string baseSlug)
+        {
+            string uniqueSlug = baseSlug;
+            int count = 1;
+
+            // Check for uniqueness in the database
+            while (await _context.Products.AnyAsync(p => p.Slug == uniqueSlug))
+            {
+                uniqueSlug = $"{baseSlug}-{count}";
+                count++;
+            }
+
+            return uniqueSlug;
         }
     }
 }
