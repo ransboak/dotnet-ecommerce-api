@@ -34,9 +34,14 @@ namespace ecommerce_api.Repositories
             return await _context.Categories.Include(c => c.Products).ToListAsync();
         }
 
-        public Task<Category?> GetByIdAsync(int id)
+        public async Task<Category?> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var category = await _context.Categories.FirstOrDefaultAsync(x => x.Id == id);
+
+            if(category == null){
+                return null;
+            }
+            return category;
         }
 
         public Task<Category?> UpdateAsync(int id, UpdateCategoryDto categoryDto)
