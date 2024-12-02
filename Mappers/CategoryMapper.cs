@@ -15,6 +15,7 @@ namespace ecommerce_api.Mappers
                 Name = categoryModel.Name,
                 Description = categoryModel.Description,
                 Slug = categoryModel.Slug,
+                Products = categoryModel.Products.Select(s => s.ToProductDto()).ToList()
             };
         }
         public static Category ToCategoryFromCreateDto(this CreateCategoryDto categoryDto){

@@ -31,7 +31,7 @@ namespace ecommerce_api.Repositories
 
         public async Task<List<Category>> GetAllAsync()
         {
-            return await _context.Categories.ToListAsync();
+            return await _context.Categories.Include(c => c.Products).ToListAsync();
         }
 
         public Task<Category?> GetByIdAsync(int id)
